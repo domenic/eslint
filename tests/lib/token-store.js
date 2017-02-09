@@ -1066,4 +1066,44 @@ describe("TokenStore", () => {
 
     });
 
+    describe("when calling getFirstToken & getTokenAfter", () => {
+        it("should retrieve all tokens and comments in the node", () => {
+            const code = "(function(a, /*b,*/ c){})";
+            const ast = espree.parse(code, { loc: true, range: true, tokens: true, comment: true });
+            const tokenStore = new TokenStore(ast.tokens, ast.comments);
+            const tokens = [];
+            let token = tokenStore.getFirstToken(ast);
+
+            while (token) {
+                tokens.push(token);
+                token = tokenStore.getTokenAfter(token, { includeComments: true });
+            }
+
+            check(
+                tokens,
+                ["(", "function", "(", "a", ",", "b,", "c", ")", "{", "}", ")"]
+            );
+        });
+    });
+
+    describe("when calling getLastToken & getTokenBefore", () => {
+        it("should retrieve all tokens and comments in the node", () => {
+            const code = "(function(a, /*b,*/ c){})";
+            const ast = espree.parse(code, { loc: true, range: true, tokens: true, comment: true });
+            const tokenStore = new TokenStore(ast.tokens, ast.comments);
+            const tokens = [];
+            let token = tokenStore.getLastToken(ast);
+
+            while (token) {
+                tokens.push(token);
+                token = tokenStore.getTokenBefore(token, { includeComments: true });
+            }
+
+            check(
+                tokens.reverse(),
+                ["(", "function", "(", "a", ",", "b,", "c", ")", "{", "}", ")"]
+            );
+        });
+    });
+
 });
